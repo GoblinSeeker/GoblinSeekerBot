@@ -8,7 +8,6 @@ client_secret = os.environ['X_CLIENT_SECRET']
 access_token = os.environ['X_ACCESS_TOKEN']
 refresh_token = os.environ['X_REFRESH_TOKEN']
 
-# Initialize Client for V2 API
 client = tweepy.Client(
     bearer_token=None,
     consumer_key=client_id,
@@ -19,38 +18,36 @@ client = tweepy.Client(
 
 def interact_with_users():
     try:
-        # Search for recent tweets about goblins to like and follow
-        search_query = "goblin mythology -is:retweet"
+        # Searching specifically for Goblin related tweets
+        search_query = "goblin folklore OR goblin sightings -is:retweet"
         tweets = client.search_recent_tweets(query=search_query, max_results=10)
         
         if tweets.data:
             target_tweet = random.choice(tweets.data)
-            # Like the tweet
             client.like(target_tweet.id)
-            # Follow the author
             client.follow_user(target_tweet.author_id)
-            print(f"Interacted with tweet ID: {target_tweet.id}")
+            print(f"Interacted with Goblin tweet ID: {target_tweet.id}")
 
-        # Reply to recent mentions
         my_user = client.get_me()
         mentions = client.get_users_mentions(id=my_user.data.id)
         
         if mentions.data:
             for mention in mentions.data:
-                reply_text = "The archive acknowledges your presence. Keep seeking the truth. #GoblinSeeker"
+                reply_text = "The Goblin Archive acknowledges your presence. The truth is hidden in the shadows. #GoblinSeeker"
                 client.create_tweet(text=reply_text, in_reply_to_tweet_id=mention.id)
-                print(f"Replied to mention: {mention.id}")
+                print(f"Replied to goblin mention: {mention.id}")
 
     except Exception as e:
         print(f"Interaction Error: {e}")
 
 def search_and_post():
+    # Strictly Goblin-focused queries
     queries = [
         "goblin sightings history",
-        "documented angel encounters",
-        "cryptid archives",
         "historical goblin reports",
-        "mystical creature sightings"
+        "goblin folklore archives",
+        "ancient goblin legends",
+        "documented goblin encounters"
     ]
     
     selected_query = random.choice(queries)
@@ -61,7 +58,7 @@ def search_and_post():
     
     if feed.entries:
         entry = random.choice(feed.entries)
-        description = entry.summary if 'summary' in entry else "A fascinating report from the archives."
+        description = entry.summary if 'summary' in entry else "A fascinating report from the goblin archives."
         if len(description) > 130:
             description = description[:127] + "..."
 
@@ -70,7 +67,6 @@ def search_and_post():
             f"Topic: {entry.title}\n"
             f"Details: {description}\n\n"
             f"Source: {entry.link}\n\n"
-            # Metadata instruction handled via code logic for Twitter formatting
             f"#GoblinSeeker $GOBLIN"
         )
         
@@ -83,7 +79,7 @@ def search_and_post():
         except Exception as e:
             print(f"Posting Error: {e}")
     else:
-        print(f"No results found for: {selected_query}")
+        print(f"No goblin results found for: {selected_query}")
 
 if __name__ == "__main__":
     search_and_post()
