@@ -13,7 +13,7 @@ client = tweepy.Client(
 )
 
 def post_news():
-    # Primary source for high-quality paranormal content
+    # Primary sources for high-quality paranormal content
     sources = [
         "https://www.unexplained-mysteries.com/headlines.xml",
         "https://www.phantomsandmonsters.com/feeds/posts/default?alt=rss"
@@ -27,7 +27,6 @@ def post_news():
         title = entry.title
         link = entry.link
 
-        # Massive phrase pool for organic variety
         intros = [
             "🚨 ALERT:", "👺 GOBLIN LOG:", "🔍 INVESTIGATION:", "⚠️ UNKNOWN:", 
             "👣 TRACKS DETECTED:", "🌑 MIDNIGHT REPORT:", "👁️ WITNESS:", 
@@ -49,41 +48,37 @@ def post_news():
         tweet_text = f"{random.choice(intros)} {title}\n\n{random.choice(connectors)}\n{link}\n\n{selected_tags}"
         
         try:
-            # Simulate "thinking/typing" time
-            time.sleep(random.randint(5, 15))
             client.create_tweet(text=tweet_text)
-            print(f"News cycle completed: {title[:30]}...")
+            print(f"Guaranteed news post published: {title[:30]}...")
         except Exception as e:
             print(f"News Error: {e}")
 
 def interact_with_world():
-    # Diverse search queries to reach different sub-communities
     search_queries = [
         "goblin sighting", "paranormal investigation", "cryptid encounter", 
-        "creature in the woods", "strange lights sky", "supernatural event",
-        "skinwalker", "mothman", "forest anomaly"
+        "creature in the woods", "strange lights sky", "supernatural event"
     ]
     
     query = f"{random.choice(search_queries)} -is:retweet"
     
     try:
-        search_results = client.search_recent_tweets(query=query, max_results=15)
+        search_results = client.search_recent_tweets(query=query, max_results=10)
         
         if search_results.data:
-            # Pick a subset of tweets to interact with (max 3)
-            interaction_batch = random.sample(search_results.data, min(len(search_results.data), 3))
+            interaction_batch = random.sample(search_results.data, min(len(search_results.data), 2))
             
             for target_tweet in interaction_batch:
-                # Random delay between interactions to look human
-                time.sleep(random.randint(20, 45))
+                # Small delay between interactions
+                time.sleep(random.randint(10, 30))
                 
-                # Probability: Always like, but only reply 50% of the time
+                # Like is 100% if interaction triggers
                 try:
                     client.like(target_tweet.id)
                     print(f"Engagement: Liked {target_tweet.id}")
                 except:
                     pass
 
+                # Reply is 50/50
                 if random.random() > 0.5:
                     replies = [
                         "This fits the #GoblinSeeker pattern perfectly. 👺",
@@ -91,9 +86,7 @@ def interact_with_world():
                         "We've seen similar reports in the Seeker network. 🔍",
                         "Classic anomaly behavior. Thanks for documenting! 👣",
                         "Interesting. The veil seems thin in that area. 🌑",
-                        "Don't ignore the signs. They are definitely active. 👁️",
-                        "Exactly what we've been warning about! #Paranormal",
-                        "Fascinating report. Adding this to the database. 📂"
+                        "Don't ignore the signs. They are definitely active. 👁️"
                     ]
                     
                     try:
@@ -102,23 +95,27 @@ def interact_with_world():
                             in_reply_to_tweet_id=target_tweet.id
                         )
                         print(f"Engagement: Replied to {target_tweet.id}")
-                    except Exception as r_e:
-                        print(f"Reply Error: {r_e}")
+                    except:
+                        pass
                 
     except Exception as e:
         print(f"Interaction Cycle Error: {e}")
 
 if __name__ == "__main__":
-    print("--- [GOBLIN SEEKER PROTOCOL INITIALIZED] ---")
+    print("--- [GOBLIN SEEKER PROTOCOL STARTING] ---")
     
-    # 80% chance to post news (makes it less predictable)
-    if random.random() < 0.8:
-        post_news()
+    # 1. RANDOM DELAY AT THE START (Avoids posting exactly at :00)
+    # Delays the execution by 2 to 12 minutes
+    start_delay = random.randint(120, 720)
+    print(f"Waiting {start_delay} seconds to look organic...")
+    time.sleep(start_delay)
+
+    # 2. GUARANTEED POST
+    post_news()
     
-    # 70% chance to interact with others
-    if random.random() < 0.7:
-        # Pause between posting and interacting
-        time.sleep(random.randint(30, 60))
+    # 3. RANDOM INTERACTION (75% chance)
+    if random.random() < 0.75:
+        time.sleep(random.randint(30, 90))
         interact_with_world()
     
     print("--- [CYCLE COMPLETED] ---")
