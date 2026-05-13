@@ -1,6 +1,7 @@
 import tweepy
 import os
 import feedparser
+import random
 
 # Load credentials from GitHub Secrets
 client_id = os.environ['X_CLIENT_ID']
@@ -8,29 +9,47 @@ client_secret = os.environ['X_CLIENT_SECRET']
 access_token = os.environ['X_ACCESS_TOKEN']
 refresh_token = os.environ['X_REFRESH_TOKEN']
 
-# Prepare OAuth 2.0 Authentication
-oauth2_user_handler = tweepy.OAuth2UserHandler(
-    client_id=client_id,
-    redirect_uri="https://google.com",
-    scope=["tweet.read", "tweet.write", "users.read", "offline.access"],
-    client_secret=client_secret
-)
-
-# Initialize Client with Access Token
+# Initialize Client
 client = tweepy.Client(access_token=access_token)
 
 def search_and_post():
-    # Search for goblin and theological entities
-    query = "goblin sighting OR cryptid OR angel encounter"
-    rss_url = f"https://news.google.com/rss/search?q={query}+when:7d&hl=en-US&gl=US&ceid=US:en"
+    # We removed the "when:7d" constraint to find older entries as well
+    # Added terms like "archive" and "history" for more variety
+    queries = [
+        "goblin sightings history",
+        "documented angel encounters",
+        "cryptid archives",
+        "historical goblin reports",
+        "mystical creature sightings"
+    ]
+    
+    selected_query = random.choice(queries)
+    rss_url = f"https://news.google.com/rss/search?q={selected_query}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(rss_url)
     
     if feed.entries:
-        entry = feed.entries[0]
-        # Optimized text for Goblin Seeker update
-        tweet_text = f"🚨 GOBLIN SEEKER UPDATE 🚨\n\n{entry.title}\n\nAnalyzing mystical significance... 🔍\n{entry.link}\n\n#GoblinSeeker $GOBLIN"
+        # Pick a random entry from the results to avoid posting the same thing every time
+        entry = random.choice(feed.entries)
+        
+        # Clean up the description (remove HTML tags if present)
+        description = entry.summary if 'summary' in entry else "A fascinating report from the archives."
+        if len(description) > 150:
+            description = description[:147] + "..."
+
+        # Construct the tweet
+        tweet_text = (
+            f"🚨 GOBLIN SEEKER ARCHIVE 🚨\n\n"
+            f"Topic: {entry.title}\n"
+            f"Details: {description}\n\n"
+            f"Source: {entry.link}\n\n"
+            f"#GoblinSeeker $GOBLIN"
+        )
         
         try:
+            # Check length for X (280 chars)
+            if len(tweet_text) > 280:
+                tweet_text = f"🚨 GOBLIN SEEKER ARCHIVE 🚨\n\n{entry.title}\n\n{entry.link}\n\n$GOBLIN"
+
             client.create_tweet(text=tweet_text)
             print("Post successful!")
         except Exception as e:
@@ -38,4 +57,4 @@ def search_and_post():
 
 if __name__ == "__main__":
     search_and_post()
-  
+    
