@@ -16,6 +16,47 @@ try:
 except Exception as e:
     print(f"❌ Auth-Client Setup Error: {e}")
 
+def generate_dynamic_report():
+    # Der Text-Baukasten für unendliche Variationen
+    intros = [
+        "Anomaly detected:", 
+        "Sensors picking up unusual readings:", 
+        "New field report:", 
+        "Monitoring local frequencies:", 
+        "Just intercepted a strange broadcast:"
+    ]
+    phenomena = [
+        "unidentified humanoid figures", 
+        "strange luminescent orbs", 
+        "erratic electromagnetic shifts", 
+        "unexplained acoustic anomalies", 
+        "sudden temperature drops"
+    ]
+    locations = [
+        "near the old logging road", 
+        "deep in the dense forest", 
+        "along the river banks", 
+        "at the edge of the abandoned sector", 
+        "in the remote northern ridge"
+    ]
+    actions = [
+        "Investigating further.", 
+        "Data logged for analysis.", 
+        "Proceeding with caution.", 
+        "Equipment is malfunctioning.", 
+        "Staying hidden to observe."
+    ]
+    tags = [
+        "#GoblinSeeker #Paranormal", 
+        "#Cryptid #Mystery", 
+        "#Anomaly #Seeker", 
+        "#Unexplained #Files"
+    ]
+
+    # Baut den Satz aus den zufälligen Bausteinen zusammen
+    tweet = f"{random.choice(intros)} {random.choice(phenomena)} {random.choice(locations)}. {random.choice(actions)}\n\n{random.choice(tags)}"
+    return tweet
+
 def post_news():
     print("📡 Fetching news from RSS feeds...")
     
@@ -46,13 +87,9 @@ def post_news():
         link = selected_entry.link
         tweet_text = f"🚨 ANOMALY REPORT: {title}\n\n#GoblinSeeker #Paranormal #Mystery\n{link}"
     else:
-        print("⚠️ No news found. Switching to manual report mode...")
-        backup_reports = [
-            "Increased electromagnetic activity detected in the woods tonight. Stay vigilant. #GoblinSeeker #Paranormal",
-            "Analyzing old eyewitness accounts of forest anomalies. The patterns are shifting. #Cryptid #Seeker",
-            "The veil is thin tonight. No new sightings reported yet, but the energy is high. #Paranormal #Goblins"
-        ]
-        tweet_text = random.choice(backup_reports)
+        print("⚠️ No news found. Generating dynamic report...")
+        # Hier rufen wir jetzt den neuen Baukasten auf
+        tweet_text = generate_dynamic_report()
 
     print(f"✍️ Attempting to post...")
     try:
