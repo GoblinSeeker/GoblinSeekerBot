@@ -18,41 +18,51 @@ except Exception as e:
 
 def post_news():
     print("📡 Fetching news from RSS feeds...")
+    # Korrigierte und stabilere URLs
     sources = [
         "https://www.unexplained-mysteries.com/headlines.xml",
-        "https://www.phantoms-and-monsters.com/feeds/posts/default?alt=rss"
+        "https://www.phantomsandmonsters.com/feeds/posts/default?alt=rss"
     ]
     
-    url = random.choice(sources)
-    feed = feedparser.parse(url)
+    selected_entry = None
+    random.shuffle(sources) # Zufällige Reihenfolge der Quellen
 
-    if not feed.entries:
-        print(f"⚠️ No entries found in feed: {url}")
-        # Falls der erste Feed leer war, probieren wir den anderen
-        url = sources[0] if url != sources[0] else sources[1]
-        feed = feedparser.parse(url)
-
-    if feed.entries:
-        entry = random.choice(feed.entries[:20])
-        # Wir kürzen den Titel, falls er zu lang ist
-        title = (entry.title[:200] + '...') if len(entry.title) > 200 else entry.title
-        tweet_text = f"🚨 ANOMALY REPORT: {title}\n\n#GoblinSeeker #Paranormal\n{entry.link}"
-        
-        print(f"✍️ Attempting to post: {title[:50]}...")
+    for url in sources:
         try:
-            client.create_tweet(text=tweet_text)
-            print(f"✅ Success: News post published!")
+            feed = feedparser.parse(url)
+            if feed.entries:
+                selected_entry = random.choice(feed.entries[:15])
+                print(f"✅ Found news in: {url}")
+                break
         except Exception as e:
-            print(f"❌ Post Error: {e}")
+            print(f"⚠️ Error reading {url}: {e}")
+
+    if selected_entry:
+        title = selected_entry.title
+        link = selected_entry.link
+        tweet_text = f"🚨 ANOMALY REPORT: {title}\n\n#GoblinSeeker #Paranormal #Mystery\n{link}"
     else:
-        print("❌ Failed to retrieve any news from all sources.")
+        # BACKUP: Falls alle Feeds down sind, postet er das hier:
+        print("⚠️ No news found. Switching to manual report mode...")
+        backup_reports = [
+            "Increased electromagnetic activity detected in the woods tonight. Stay vigilant. #GoblinSeeker #Paranormal",
+            "Analyzing old eyewitness accounts of forest anomalies. The patterns are shifting. #Cryptid #Seeker",
+            "The veil is thin tonight. No new sightings reported yet, but the energy is high. #Paranormal #Goblins"
+        ]
+        tweet_text = random.choice(backup_reports)
+
+    print(f"✍️ Attempting to post...")
+    try:
+        client.create_tweet(text=tweet_text)
+        print(f"✅ Success: Post published!")
+    except Exception as e:
+        print(f"❌ Post Error: {e}")
 
 if __name__ == "__main__":
     print("--- [GOBLIN SEEKER PROTOCOL STARTING] ---")
     
-    # Kürzeste Verzögerung für diesen finalen Test (30-60 Sekunden)
-    # Wir wollen ja nicht ewig warten, um zu sehen ob es geht
-    wait_time = random.randint(30, 60)
+    # Kurz für den Test
+    wait_time = random.randint(10, 30)
     print(f"🕵️ Stealth mode: Waiting {wait_time} seconds...")
     time.sleep(wait_time)
 
