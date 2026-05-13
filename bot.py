@@ -4,13 +4,13 @@ import os
 import random
 import time
 
-# Authentifizierung
+# Authenticate to X API
 try:
     client = tweepy.Client(
-        consumer_key=os.environ['X_CLIENT_ID'], 
-        consumer_secret=os.environ['X_CLIENT_SECRET'],
-        access_token=os.environ['X_ACCESS_TOKEN'],
-        access_token_secret=os.environ['X_REFRESH_TOKEN']
+        consumer_key=os.environ.get('X_CLIENT_ID'), 
+        consumer_secret=os.environ.get('X_CLIENT_SECRET'),
+        access_token=os.environ.get('X_ACCESS_TOKEN'),
+        access_token_secret=os.environ.get('X_REFRESH_TOKEN')
     )
     print("✅ Auth-Client initialized.")
 except Exception as e:
@@ -18,22 +18,26 @@ except Exception as e:
 
 def post_news():
     print("📡 Fetching news from RSS feeds...")
-    # Korrigierte und stabilere URLs
+    
     sources = [
         "https://www.unexplained-mysteries.com/headlines.xml",
-        "https://www.phantomsandmonsters.com/feeds/posts/default?alt=rss"
+        "https://www.phantomsandmonsters.com/feeds/posts/default",
+        "https://www.cryptozoologynews.com/feed/",
+        "https://www.singularfortean.com/news?format=rss"
     ]
     
     selected_entry = None
-    random.shuffle(sources) # Zufällige Reihenfolge der Quellen
+    random.shuffle(sources)
 
     for url in sources:
         try:
             feed = feedparser.parse(url)
             if feed.entries:
-                selected_entry = random.choice(feed.entries[:15])
+                selected_entry = random.choice(feed.entries[:10])
                 print(f"✅ Found news in: {url}")
                 break
+            else:
+                print(f"⚠️ Feed empty: {url}")
         except Exception as e:
             print(f"⚠️ Error reading {url}: {e}")
 
@@ -42,7 +46,6 @@ def post_news():
         link = selected_entry.link
         tweet_text = f"🚨 ANOMALY REPORT: {title}\n\n#GoblinSeeker #Paranormal #Mystery\n{link}"
     else:
-        # BACKUP: Falls alle Feeds down sind, postet er das hier:
         print("⚠️ No news found. Switching to manual report mode...")
         backup_reports = [
             "Increased electromagnetic activity detected in the woods tonight. Stay vigilant. #GoblinSeeker #Paranormal",
@@ -61,8 +64,7 @@ def post_news():
 if __name__ == "__main__":
     print("--- [GOBLIN SEEKER PROTOCOL STARTING] ---")
     
-    # Kurz für den Test
-    wait_time = random.randint(10, 30)
+    wait_time = random.randint(120, 720)
     print(f"🕵️ Stealth mode: Waiting {wait_time} seconds...")
     time.sleep(wait_time)
 
