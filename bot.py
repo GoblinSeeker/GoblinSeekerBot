@@ -3,52 +3,38 @@ import os
 import feedparser
 import random
 
-client_id = os.environ['X_CLIENT_ID']
-client_secret = os.environ['X_CLIENT_SECRET']
+# Wir laden die 1.0a Keys aus deinen Secrets
+api_key = os.environ['X_CLIENT_ID']
+api_secret = os.environ['X_CLIENT_SECRET']
 access_token = os.environ['X_ACCESS_TOKEN']
-refresh_token = os.environ['X_REFRESH_TOKEN']
+access_secret = os.environ['X_REFRESH_TOKEN']
 
+# Authentifizierung strikt nach OAuth 1.0a
+auth = tweepy.OAuth1UserHandler(api_key, api_secret, access_token, access_secret)
+api = tweepy.API(auth)
+
+# Client für v2 Befehle (wie create_tweet) mit 1.0a Daten füttern
 client = tweepy.Client(
-    consumer_key=client_id,
-    consumer_secret=client_secret,
+    consumer_key=api_key,
+    consumer_secret=api_secret,
     access_token=access_token,
-    access_token_secret=refresh_token
+    access_token_secret=access_secret
 )
 
-def interact_with_users():
-    try:
-        search_query = "goblin folklore OR goblin sightings -is:retweet"
-        tweets = client.search_recent_tweets(query=search_query, max_results=5)
-        if tweets.data:
-            target_tweet = random.choice(tweets.data)
-            client.like(target_tweet.id)
-            client.follow_user(target_tweet.author_id)
-            print(f"Interacted with ID: {target_tweet.id}")
-    except Exception as e:
-        print(f"Interaction Error: {e}")
-
 def search_and_post():
-    queries = [
-        "goblin sightings history",
-        "historical goblin reports",
-        "goblin folklore archives",
-        "ancient goblin legends",
-        "documented goblin encounters"
-    ]
-    selected_query = random.choice(queries)
-    rss_url = f"https://news.google.com/rss/search?q={selected_query.replace(' ', '+')}&hl=en-US&gl=US&ceid=US:en"
+    query = "goblin sightings"
+    rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(rss_url)
+    
     if feed.entries:
         entry = random.choice(feed.entries)
-        tweet_text = f"🚨 GOBLIN SEEKER ARCHIVE 🚨\n\nTopic: {entry.title}\n\nSource: {entry.link}\n\n#GoblinSeeker $GOBLIN"
+        tweet_text = f"🚨 GOBLIN NEWS 🚨\n\n{entry.title}\n\n{entry.link}\n\n#GoblinSeeker"
+        
         try:
             client.create_tweet(text=tweet_text)
-            print(f"Post successful: {selected_query}")
+            print("Erfolg! Der Post ist raus.")
         except Exception as e:
-            print(f"Posting Error: {e}")
-    else:
-        print(f"No results for: {selected_query}")
+            print(f"Fehler: {e}")
 
 if __name__ == "__main__":
     search_and_post()
-    interact_with_users()
