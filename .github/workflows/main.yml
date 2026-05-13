@@ -1,0 +1,31 @@
+name: Goblin Seeker Bot
+
+on:
+  schedule:
+    - cron: '0 * * * *' # This triggers the bot every hour (at the start of the hour)
+  workflow_dispatch: # This allows you to start the bot manually for testing
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install required libraries
+        run: |
+          pip install -r requirements.txt
+
+      - name: Execute the bot script
+        env:
+          X_CLIENT_ID: ${{ secrets.X_CLIENT_ID }}
+          X_CLIENT_SECRET: ${{ secrets.X_CLIENT_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_REFRESH_TOKEN: ${{ secrets.X_REFRESH_TOKEN }}
+        run: python bot.py
+        
